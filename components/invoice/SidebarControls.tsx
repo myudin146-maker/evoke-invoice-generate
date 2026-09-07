@@ -42,19 +42,62 @@ export default function SidebarControls() {
   const handleDownloadPDF = async () => {
     setDownloading(true)
     try {
-      const html2pdf = (await import('html2pdf.js')).default
+      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+        import('jspdf'),
+        import('html2canvas'),
+      ])
+
       const element = document.getElementById('invoice-canvas')
       if (!element) return
-      const opt = {
-        margin: [10, 10] as [number, number],
-        filename: `${invoice.invoice_number}.pdf`,
-        image: { type: 'jpeg' as const, quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, allowTaint: true },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } as any,
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+
+      // Sembunyikan elemen no-print sementara
+      const noPrintEls = element.querySelectorAll<HTMLElement>('.no-print')
+      noPrintEls.forEach((el) => { el.style.display = 'none' })
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        onclone: (_doc, clonedEl) => {
+          clonedEl.style.fontFamily = 'Arial, sans-serif'
+          // Override warna oklch/lab yang tidak didukung jsPDF
+          clonedEl.querySelectorAll<HTMLElement>('*').forEach((el) => {
+            const s = el.style
+            if (s.color?.includes('oklch') || s.color?.includes('lab')) {
+              s.color = '#1a1a1a'
+            }
+            if (s.backgroundColor?.includes('oklch') || s.backgroundColor?.includes('lab')) {
+              s.backgroundColor = '#ffffff'
+            }
+          })
+        },
+      })
+
+      // Restore elemen no-print
+      noPrintEls.forEach((el) => { el.style.display = '' })
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.98)
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = pdf.internal.pageSize.getHeight()
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width
+
+      let heightLeft = imgHeight
+      let position = 0
+
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight)
+      heightLeft -= pdfHeight
+
+      while (heightLeft > 0) {
+        position -= pdfHeight
+        pdf.addPage()
+        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight)
+        heightLeft -= pdfHeight
       }
-      await html2pdf().set(opt).from(element).save()
+
+      pdf.save(`${invoice.invoice_number}.pdf`)
     } catch (e) {
       console.error(e)
     } finally {
@@ -73,7 +116,6 @@ export default function SidebarControls() {
       const url = await uploadLogo(file, user.id)
       if (url) updateInvoice({ logo_url: url })
     } else {
-      // Guest: use base64
       const reader = new FileReader()
       reader.onload = (ev) => {
         updateInvoice({ logo_url: ev.target?.result as string })
