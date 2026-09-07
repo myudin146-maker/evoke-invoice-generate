@@ -23,6 +23,7 @@ export async function saveInvoice(
     discount: discountAmount,
     total_amount: total,
     notes: invoiceData.notes,
+    status: invoiceData.status ?? 'draft',
     data: invoiceData,
   }
 

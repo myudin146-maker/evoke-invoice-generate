@@ -11,6 +11,7 @@ const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().sp
 export const defaultInvoiceData: InvoiceData = {
   template: 'company',
   currency: 'IDR',
+  status: 'draft',
   logo_url: null,
   company_name: 'Nama Perusahaan Anda',
   sender_address: 'Jl. Contoh No. 123, Jakarta, Indonesia',
@@ -43,14 +44,14 @@ export const defaultInvoiceData: InvoiceData = {
 interface InvoiceStore {
   invoice: InvoiceData
   isDirty: boolean
+  currentInvoiceId: string | null
   updateInvoice: (updates: Partial<InvoiceData>) => void
   updateItem: (id: string, updates: Partial<InvoiceItem>) => void
   addItem: () => void
   removeItem: (id: string) => void
   resetInvoice: () => void
-  loadInvoice: (data: InvoiceData) => void
-
-  // Calculated values
+  loadInvoice: (data: InvoiceData, invoiceId?: string) => void
+  setCurrentInvoiceId: (id: string | null) => void
   getSubtotal: () => number
   getTaxAmount: () => number
   getDiscountAmount: () => number
@@ -69,6 +70,7 @@ export const useInvoiceStore = create<InvoiceStore>()(
     (set, get) => ({
       invoice: defaultInvoiceData,
       isDirty: false,
+      currentInvoiceId: null,
 
       updateInvoice: (updates) => {
         set((state) => ({
@@ -121,40 +123,38 @@ export const useInvoiceStore = create<InvoiceStore>()(
 
       resetInvoice: () => {
         set({
-          invoice: {
-            ...defaultInvoiceData,
-            invoice_number: generateInvoiceNumber(),
-          },
+          invoice: { ...defaultInvoiceData, invoice_number: generateInvoiceNumber() },
           isDirty: false,
+          currentInvoiceId: null,
         })
       },
 
-      loadInvoice: (data) => {
-        set({ invoice: data, isDirty: false })
+      loadInvoice: (data, invoiceId) => {
+        set({
+          invoice: { ...data, status: data.status || 'draft' },
+          isDirty: false,
+          currentInvoiceId: invoiceId || null,
+        })
       },
+
+      setCurrentInvoiceId: (id) => set({ currentInvoiceId: id }),
 
       getSubtotal: () => {
         const { items } = get().invoice
-        return items.reduce((sum, item) => {
-          return Math.round((sum + (item.total_price || 0)) * 100) / 100
-        }, 0)
+        return items.reduce((sum, item) => Math.round((sum + (item.total_price || 0)) * 100) / 100, 0)
       },
 
       getTaxAmount: () => {
         const { tax_rate, tax_type } = get().invoice
         const subtotal = get().getSubtotal()
-        if (tax_type === 'percent') {
-          return Math.round(subtotal * (Number(tax_rate) / 100) * 100) / 100
-        }
+        if (tax_type === 'percent') return Math.round(subtotal * (Number(tax_rate) / 100) * 100) / 100
         return Number(tax_rate) || 0
       },
 
       getDiscountAmount: () => {
         const { discount, discount_type } = get().invoice
         const subtotal = get().getSubtotal()
-        if (discount_type === 'percent') {
-          return Math.round(subtotal * (Number(discount) / 100) * 100) / 100
-        }
+        if (discount_type === 'percent') return Math.round(subtotal * (Number(discount) / 100) * 100) / 100
         return Number(discount) || 0
       },
 
@@ -167,10 +167,9 @@ export const useInvoiceStore = create<InvoiceStore>()(
       },
     }),
     {
-      name: 'evoke-invoice-draft', // key di localStorage
+      name: 'evoke-invoice-draft',
       storage: createJSONStorage(() => localStorage),
-      // Hanya persist data invoice, bukan isDirty
-      partialize: (state) => ({ invoice: state.invoice }),
+      partialize: (state) => ({ invoice: state.invoice, currentInvoiceId: state.currentInvoiceId }),
     }
   )
 )

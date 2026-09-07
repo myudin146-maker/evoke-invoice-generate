@@ -1,5 +1,6 @@
 export type InvoiceTemplate = 'company' | 'simple'
 export type Currency = 'IDR' | 'USD'
+export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue'
 
 export interface InvoiceItem {
   id: string
@@ -14,6 +15,7 @@ export interface InvoiceData {
   // Template
   template: InvoiceTemplate
   currency: Currency
+  status: InvoiceStatus
 
   // Header
   logo_url: string | null
@@ -58,6 +60,14 @@ export interface SavedInvoice {
   discount: number
   total_amount: number
   notes: string
+  status: InvoiceStatus
   created_at: string
   data: InvoiceData
+}
+
+export interface InvoicePreset {
+  id: string
+  name: string
+  data: InvoiceData
+  created_at: string
 }

@@ -158,3 +158,9 @@ create policy "Users can delete own logos"
     bucket_id = 'logos'
     and auth.uid()::text = (storage.foldername(name))[1]
   );
+
+-- =============================================
+-- Migration: Add status column to invoices
+-- Run this if your invoices table already exists
+-- =============================================
+ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS status text default 'draft';
