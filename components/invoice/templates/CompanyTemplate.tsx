@@ -64,15 +64,15 @@ export default function CompanyTemplate() {
         <div className="text-right">
           <h1 className="text-4xl font-extrabold text-indigo-600 tracking-tight">INVOICE</h1>
           <div className="mt-2 text-sm text-gray-500 space-y-1">
-            <p>
+            <div className="flex items-center justify-end gap-1">
               <span className="font-medium text-gray-700">#</span>
               <EditableField
                 value={invoice.invoice_number}
                 onChange={(v) => updateInvoice({ invoice_number: v })}
-                className="inline font-semibold text-gray-800 ml-1"
+                className="font-semibold text-gray-800"
                 placeholder="INV-001"
               />
-            </p>
+            </div>
           </div>
         </div>
       </div>
