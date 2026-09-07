@@ -168,8 +168,19 @@ export const useInvoiceStore = create<InvoiceStore>()(
     }),
     {
       name: 'evoke-invoice-draft',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => {
+        // Hindari akses localStorage saat SSR
+        if (typeof window === 'undefined') {
+          return {
+            getItem: () => null,
+            setItem: () => {},
+            removeItem: () => {},
+          }
+        }
+        return localStorage
+      }),
       partialize: (state) => ({ invoice: state.invoice, currentInvoiceId: state.currentInvoiceId }),
+      skipHydration: true,
     }
   )
 )

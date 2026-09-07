@@ -3,6 +3,7 @@ import InvoiceCanvas from '@/components/invoice/InvoiceCanvas'
 import SidebarControls from '@/components/invoice/SidebarControls'
 import MobileEditForm from '@/components/invoice/MobileEditForm'
 import MobileBottomBar from '@/components/invoice/MobileBottomBar'
+import HydrationGuard from '@/components/HydrationGuard'
 
 export default function Home() {
   return (
@@ -13,12 +14,16 @@ export default function Home() {
         <div className="flex flex-col lg:flex-row gap-6 items-start">
           {/* Sidebar — hidden on mobile */}
           <aside className="no-print hidden lg:block w-72 flex-shrink-0 lg:sticky lg:top-20">
-            <SidebarControls />
+            <HydrationGuard>
+              <SidebarControls />
+            </HydrationGuard>
           </aside>
 
           {/* Invoice Canvas */}
           <div id="invoice-print-wrapper" className="flex-1 min-w-0 w-full">
-            <InvoiceCanvas />
+            <HydrationGuard>
+              <InvoiceCanvas />
+            </HydrationGuard>
           </div>
         </div>
       </main>
@@ -27,7 +32,9 @@ export default function Home() {
       <MobileBottomBar />
 
       {/* Mobile edit FAB */}
-      <MobileEditForm />
+      <HydrationGuard>
+        <MobileEditForm />
+      </HydrationGuard>
     </div>
   )
 }
