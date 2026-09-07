@@ -15,7 +15,7 @@ export default function Home() {
           </aside>
 
           {/* Invoice Canvas */}
-          <div className="flex-1 min-w-0 w-full">
+          <div id="invoice-print-wrapper" className="flex-1 min-w-0 w-full">
             <InvoiceCanvas />
           </div>
         </div>

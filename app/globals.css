@@ -44,31 +44,50 @@ body {
 
 /* Print / PDF styles */
 @media print {
-  body * {
-    visibility: hidden;
+  /* Sembunyikan semua kecuali invoice canvas */
+  body > * {
+    display: none !important;
   }
-  #invoice-canvas,
-  #invoice-canvas * {
-    visibility: visible;
-  }
-  #invoice-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 794px;
-    min-height: 1123px;
-    box-shadow: none !important;
+
+  body {
     margin: 0 !important;
-    padding: 40px !important;
+    padding: 0 !important;
+    background: white !important;
   }
+
+  /* Tampilkan hanya invoice canvas */
+  #invoice-print-wrapper {
+    display: block !important;
+  }
+
+  #invoice-canvas {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   .no-print {
     display: none !important;
   }
+
+  /* Hindari baris tabel terpotong antar halaman */
   tr {
     page-break-inside: avoid;
   }
+
   thead {
     display: table-header-group;
+  }
+
+  /* Ukuran kertas A4 */
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
   }
 }
 
