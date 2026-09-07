@@ -127,14 +127,34 @@ insert into storage.buckets (id, name, public)
 values ('logos', 'logos', true)
 on conflict (id) do nothing;
 
-create policy "Authenticated users can upload logos"
-  on storage.objects for insert
-  with check (bucket_id = 'logos' and auth.role() = 'authenticated');
+-- Drop existing policies dulu untuk avoid conflict
+drop policy if exists "Authenticated users can upload logos" on storage.objects;
+drop policy if exists "Public can read logos" on storage.objects;
+drop policy if exists "Users can delete own logos" on storage.objects;
+drop policy if exists "Users can update own logos" on storage.objects;
 
 create policy "Public can read logos"
   on storage.objects for select
   using (bucket_id = 'logos');
 
+create policy "Authenticated users can upload logos"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'logos'
+    and auth.uid() is not null
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "Users can update own logos"
+  on storage.objects for update
+  using (
+    bucket_id = 'logos'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
+
 create policy "Users can delete own logos"
   on storage.objects for delete
-  using (bucket_id = 'logos' and auth.uid()::text = (storage.foldername(name))[1]);
+  using (
+    bucket_id = 'logos'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );

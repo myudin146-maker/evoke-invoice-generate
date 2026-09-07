@@ -57,20 +57,49 @@ export default function SidebarControls() {
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
+        allowTaint: true,
         backgroundColor: '#ffffff',
         logging: false,
-        onclone: (_doc, clonedEl) => {
-          clonedEl.style.fontFamily = 'Arial, sans-serif'
-          // Override warna oklch/lab yang tidak didukung jsPDF
-          clonedEl.querySelectorAll<HTMLElement>('*').forEach((el) => {
-            const s = el.style
-            if (s.color?.includes('oklch') || s.color?.includes('lab')) {
-              s.color = '#1a1a1a'
+        onclone: (clonedDoc, clonedEl) => {
+          // Inject CSS yang override semua warna oklch/lab ke hex
+          // Ini mencegah error "unsupported color function lab" di jsPDF
+          const style = clonedDoc.createElement('style')
+          style.textContent = `
+            * {
+              color: revert !important;
+              background-color: revert !important;
             }
-            if (s.backgroundColor?.includes('oklch') || s.backgroundColor?.includes('lab')) {
-              s.backgroundColor = '#ffffff'
+            :root {
+              --tw-prose-body: #374151;
+              --background: #f8f9fa;
+              --foreground: #171717;
             }
-          })
+            /* Force semua elemen pakai warna hex, hindari oklch/lab */
+            body, div, p, span, h1, h2, h3, h4, h5, h6, td, th, li {
+              color: inherit;
+            }
+            .text-indigo-600, .text-indigo-700 { color: #4f46e5 !important; }
+            .text-gray-900 { color: #111827 !important; }
+            .text-gray-800 { color: #1f2937 !important; }
+            .text-gray-700 { color: #374151 !important; }
+            .text-gray-600 { color: #4b5563 !important; }
+            .text-gray-500 { color: #6b7280 !important; }
+            .text-gray-400 { color: #9ca3af !important; }
+            .text-gray-300 { color: #d1d5db !important; }
+            .text-green-600 { color: #16a34a !important; }
+            .bg-white { background-color: #ffffff !important; }
+            .bg-gray-50 { background-color: #f9fafb !important; }
+            .bg-indigo-100 { background-color: #e0e7ff !important; }
+            .border-indigo-600 { border-color: #4f46e5 !important; }
+            .border-gray-100 { border-color: #f3f4f6 !important; }
+            .border-gray-200 { border-color: #e5e7eb !important; }
+            .border-gray-300 { border-color: #d1d5db !important; }
+            .no-print { display: none !important; }
+          `
+          clonedDoc.head.appendChild(style)
+          clonedEl.style.fontFamily = 'Arial, Helvetica, sans-serif'
+          clonedEl.style.backgroundColor = '#ffffff'
+          clonedEl.style.color = '#111827'
         },
       })
 
