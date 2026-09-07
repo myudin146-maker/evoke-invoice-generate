@@ -23,7 +23,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Guard: only initialise Supabase when valid credentials are present
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     if (!url || url === 'your_supabase_project_url' || !key || key === 'your_supabase_anon_key') {
@@ -41,23 +40,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
 
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        (_event, session) => {
+        (event, session) => {
+          const prevUser = user
+          const nextUser = session?.user ?? null
+
+          // Kalau ganti akun atau logout, reset draft invoice
+          if (prevUser && prevUser.id !== nextUser?.id) {
+            // Reset localStorage draft saat user berubah
+            localStorage.removeItem('evoke-invoice-draft')
+            // Reset currentInvoiceId
+            import('@/store/invoiceStore').then(({ useInvoiceStore }) => {
+              useInvoiceStore.getState().resetInvoice()
+            })
+          }
+
           setSession(session)
-          setUser(session?.user ?? null)
+          setUser(nextUser)
           setLoading(false)
         }
       )
 
       return () => subscription.unsubscribe()
     })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const signOut = async () => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     if (!url || url === 'your_supabase_project_url' || !key) return
+
+    // Reset draft saat logout
+    localStorage.removeItem('evoke-invoice-draft')
     const { createClient } = await import('@/lib/supabase/client')
     await createClient().auth.signOut()
+
+    // Reset store setelah logout
+    const { useInvoiceStore } = await import('@/store/invoiceStore')
+    useInvoiceStore.getState().resetInvoice()
   }
 
   return (
