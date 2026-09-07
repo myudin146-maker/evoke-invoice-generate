@@ -72,16 +72,29 @@ export async function deleteInvoice(invoiceId: string): Promise<boolean> {
 export async function uploadLogo(file: File, userId: string): Promise<string | null> {
   const supabase = createClient()
   const ext = file.name.split('.').pop()
-  const filePath = `${userId}/logo.${ext}`
+  // Tambahkan timestamp agar URL selalu unik dan tidak kena cache browser
+  const filePath = `${userId}/logo_${Date.now()}.${ext}`
 
+  // Hapus logo lama dulu
+  const { data: existingFiles } = await supabase.storage
+    .from('logos')
+    .list(userId)
+
+  if (existingFiles && existingFiles.length > 0) {
+    const oldPaths = existingFiles.map((f) => `${userId}/${f.name}`)
+    await supabase.storage.from('logos').remove(oldPaths)
+  }
+
+  // Upload file baru
   const { error } = await supabase.storage
     .from('logos')
-    .upload(filePath, file, { upsert: true })
+    .upload(filePath, file, { upsert: false })
 
   if (error) { console.error(error); return null }
 
   const { data } = supabase.storage.from('logos').getPublicUrl(filePath)
-  return data.publicUrl
+  // Tambahkan cache-buster ke URL agar browser tidak pakai cache lama
+  return `${data.publicUrl}?t=${Date.now()}`
 }
 
 // Sync local storage invoices to DB after login

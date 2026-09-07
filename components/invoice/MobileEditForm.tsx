@@ -34,7 +34,8 @@ export default function MobileEditForm() {
       reader.onload = (ev) => updateInvoice({ logo_url: ev.target?.result as string })
       reader.readAsDataURL(file)
     }
-    e.target.value = ''
+    // Reset agar file yang sama bisa dipilih ulang setelah hapus logo
+    if (fileRef.current) fileRef.current.value = ''
   }
 
   const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (

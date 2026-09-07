@@ -19,12 +19,13 @@ export default function CompanyTemplate() {
           {/* Logo */}
           <div className="flex-shrink-0">
             {invoice.logo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={invoice.logo_url}
-                alt="Logo"
-                className="h-16 w-16 object-contain rounded-xl border border-gray-100"
-              />
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={invoice.logo_url}
+              src={invoice.logo_url}
+              alt="Logo"
+              className="h-16 w-16 object-contain rounded-xl border border-gray-100"
+            />
             ) : (
               <div className="h-16 w-16 bg-indigo-100 rounded-xl flex items-center justify-center">
                 <Building2 className="w-8 h-8 text-indigo-400" />

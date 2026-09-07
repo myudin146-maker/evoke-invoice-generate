@@ -75,8 +75,8 @@ export default function SidebarControls() {
       reader.onload = (ev) => updateInvoice({ logo_url: ev.target?.result as string })
       reader.readAsDataURL(file)
     }
-    // Reset input agar file yang sama bisa diupload ulang
-    e.target.value = ''
+    // Reset input value agar file yang sama bisa dipilih ulang setelah hapus
+    if (fileRef.current) fileRef.current.value = ''
   }
 
   const handleSaveAsTemplate = () => {
