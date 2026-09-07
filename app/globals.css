@@ -44,7 +44,7 @@ body {
 
 /* Print / PDF styles */
 @media print {
-  body * {
+  * {
     visibility: hidden;
   }
 
@@ -53,19 +53,30 @@ body {
     visibility: visible;
   }
 
+  .no-print,
+  .no-print * {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   #invoice-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    max-width: 100% !important;
+    min-height: auto !important;
     box-shadow: none !important;
     border-radius: 0 !important;
     margin: 0 !important;
-  }
-
-  .no-print {
-    display: none !important;
-    visibility: hidden !important;
+    padding: 40px !important;
+    transform: none !important;
+    transform-origin: top left !important;
   }
 
   tr {
@@ -78,7 +89,7 @@ body {
 
   @page {
     size: A4 portrait;
-    margin: 10mm;
+    margin: 0;
   }
 }
 
