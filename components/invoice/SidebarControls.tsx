@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import { useInvoiceStore } from '@/store/invoiceStore'
 import { useAuth } from '@/context/AuthContext'
-import { saveInvoice } from '@/lib/invoiceService'
+import { saveInvoice, uploadLogo } from '@/lib/invoiceService'
 import { formatCurrency } from '@/lib/utils'
 import { InvoiceStatus, InvoicePreset } from '@/types/invoice'
 import Button from '../ui/Button'
@@ -68,14 +68,15 @@ export default function SidebarControls() {
     const file = e.target.files?.[0]
     if (!file) return
     if (user) {
-      const { uploadLogo: ul } = await import('@/lib/invoiceService')
-      const url = await ul(file, user.id)
+      const url = await uploadLogo(file, user.id)
       if (url) updateInvoice({ logo_url: url })
     } else {
       const reader = new FileReader()
       reader.onload = (ev) => updateInvoice({ logo_url: ev.target?.result as string })
       reader.readAsDataURL(file)
     }
+    // Reset input agar file yang sama bisa diupload ulang
+    e.target.value = ''
   }
 
   const handleSaveAsTemplate = () => {

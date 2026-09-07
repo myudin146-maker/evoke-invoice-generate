@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useInvoiceStore } from '@/store/invoiceStore'
+import { useAuth } from '@/context/AuthContext'
+import { uploadLogo } from '@/lib/invoiceService'
 import { formatCurrency } from '@/lib/utils'
-import { X, Plus, Trash2, ChevronDown, ChevronUp, Pencil } from 'lucide-react'
+import { X, Plus, Trash2, ChevronDown, ChevronUp, Pencil, Upload } from 'lucide-react'
 import Button from '../ui/Button'
 
 export default function MobileEditForm() {
@@ -11,13 +13,29 @@ export default function MobileEditForm() {
     invoice, updateInvoice, updateItem, addItem, removeItem,
     getSubtotal, getTaxAmount, getDiscountAmount, getTotal,
   } = useInvoiceStore()
+  const { user } = useAuth()
 
   const [open, setOpen] = useState(false)
   const [activeSection, setActiveSection] = useState<string | null>('sender')
+  const fileRef = useRef<HTMLInputElement>(null)
 
   const total = getTotal()
 
   const toggle = (s: string) => setActiveSection(activeSection === s ? null : s)
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (user) {
+      const url = await uploadLogo(file, user.id)
+      if (url) updateInvoice({ logo_url: url })
+    } else {
+      const reader = new FileReader()
+      reader.onload = (ev) => updateInvoice({ logo_url: ev.target?.result as string })
+      reader.readAsDataURL(file)
+    }
+    e.target.value = ''
+  }
 
   const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
     <div className="border border-gray-100 rounded-xl overflow-hidden">
@@ -86,6 +104,30 @@ export default function MobileEditForm() {
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         <Section id="sender" title="🏢 Info Pengirim">
+          {/* Upload Logo */}
+          <div>
+            <label className="text-xs font-medium text-gray-500 block mb-2">Logo Perusahaan</label>
+            {invoice.logo_url && (
+              <div className="flex items-center gap-2 mb-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={invoice.logo_url} alt="Logo" className="h-12 w-auto object-contain rounded-lg border border-gray-100" />
+                <button
+                  onClick={() => updateInvoice({ logo_url: null })}
+                  className="text-xs text-red-400 hover:text-red-600 underline"
+                >
+                  Hapus logo
+                </button>
+              </div>
+            )}
+            <input type="file" ref={fileRef} accept="image/*" className="hidden" onChange={handleLogoUpload} />
+            <button
+              onClick={() => fileRef.current?.click()}
+              className="w-full flex items-center justify-center gap-2 py-2.5 border-2 border-dashed border-gray-200 rounded-xl text-sm text-gray-500 hover:border-indigo-300 hover:text-indigo-500 transition"
+            >
+              <Upload className="w-4 h-4" />
+              {invoice.logo_url ? 'Ganti Logo' : 'Upload Logo'}
+            </button>
+          </div>
           <Field label="Nama Perusahaan" value={invoice.company_name} onChange={(v) => updateInvoice({ company_name: v })} />
           <Field label="Alamat" value={invoice.sender_address} onChange={(v) => updateInvoice({ sender_address: v })} multiline />
           <Field label="NPWP (opsional)" value={invoice.tax_number} onChange={(v) => updateInvoice({ tax_number: v })} />
