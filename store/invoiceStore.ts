@@ -1,6 +1,7 @@
 'use client'
 
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import { InvoiceData, InvoiceItem } from '@/types/invoice'
 import { generateInvoiceNumber } from '@/lib/utils'
 
@@ -59,108 +60,117 @@ interface InvoiceStore {
 function recalcItem(item: InvoiceItem): InvoiceItem {
   const qty = Number(item.quantity) || 0
   const price = Number(item.unit_price) || 0
-  // Safe integer math
   const total = Math.round(qty * price * 100) / 100
   return { ...item, total_price: total }
 }
 
-export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
-  invoice: defaultInvoiceData,
-  isDirty: false,
-
-  updateInvoice: (updates) => {
-    set((state) => ({
-      invoice: { ...state.invoice, ...updates },
-      isDirty: true,
-    }))
-  },
-
-  updateItem: (id, updates) => {
-    set((state) => ({
-      invoice: {
-        ...state.invoice,
-        items: state.invoice.items.map((item) =>
-          item.id === id ? recalcItem({ ...item, ...updates }) : item
-        ),
-      },
-      isDirty: true,
-    }))
-  },
-
-  addItem: () => {
-    set((state) => ({
-      invoice: {
-        ...state.invoice,
-        items: [
-          ...state.invoice.items,
-          {
-            id: crypto.randomUUID(),
-            item_name: 'Item Baru',
-            description: '',
-            quantity: 1,
-            unit_price: 0,
-            total_price: 0,
-          },
-        ],
-      },
-      isDirty: true,
-    }))
-  },
-
-  removeItem: (id) => {
-    set((state) => ({
-      invoice: {
-        ...state.invoice,
-        items: state.invoice.items.filter((item) => item.id !== id),
-      },
-      isDirty: true,
-    }))
-  },
-
-  resetInvoice: () => {
-    set({
-      invoice: {
-        ...defaultInvoiceData,
-        invoice_number: generateInvoiceNumber(),
-      },
+export const useInvoiceStore = create<InvoiceStore>()(
+  persist(
+    (set, get) => ({
+      invoice: defaultInvoiceData,
       isDirty: false,
-    })
-  },
 
-  loadInvoice: (data) => {
-    set({ invoice: data, isDirty: false })
-  },
+      updateInvoice: (updates) => {
+        set((state) => ({
+          invoice: { ...state.invoice, ...updates },
+          isDirty: true,
+        }))
+      },
 
-  getSubtotal: () => {
-    const { items } = get().invoice
-    return items.reduce((sum, item) => {
-      return Math.round((sum + (item.total_price || 0)) * 100) / 100
-    }, 0)
-  },
+      updateItem: (id, updates) => {
+        set((state) => ({
+          invoice: {
+            ...state.invoice,
+            items: state.invoice.items.map((item) =>
+              item.id === id ? recalcItem({ ...item, ...updates }) : item
+            ),
+          },
+          isDirty: true,
+        }))
+      },
 
-  getTaxAmount: () => {
-    const { tax_rate, tax_type } = get().invoice
-    const subtotal = get().getSubtotal()
-    if (tax_type === 'percent') {
-      return Math.round(subtotal * (Number(tax_rate) / 100) * 100) / 100
+      addItem: () => {
+        set((state) => ({
+          invoice: {
+            ...state.invoice,
+            items: [
+              ...state.invoice.items,
+              {
+                id: crypto.randomUUID(),
+                item_name: 'Item Baru',
+                description: '',
+                quantity: 1,
+                unit_price: 0,
+                total_price: 0,
+              },
+            ],
+          },
+          isDirty: true,
+        }))
+      },
+
+      removeItem: (id) => {
+        set((state) => ({
+          invoice: {
+            ...state.invoice,
+            items: state.invoice.items.filter((item) => item.id !== id),
+          },
+          isDirty: true,
+        }))
+      },
+
+      resetInvoice: () => {
+        set({
+          invoice: {
+            ...defaultInvoiceData,
+            invoice_number: generateInvoiceNumber(),
+          },
+          isDirty: false,
+        })
+      },
+
+      loadInvoice: (data) => {
+        set({ invoice: data, isDirty: false })
+      },
+
+      getSubtotal: () => {
+        const { items } = get().invoice
+        return items.reduce((sum, item) => {
+          return Math.round((sum + (item.total_price || 0)) * 100) / 100
+        }, 0)
+      },
+
+      getTaxAmount: () => {
+        const { tax_rate, tax_type } = get().invoice
+        const subtotal = get().getSubtotal()
+        if (tax_type === 'percent') {
+          return Math.round(subtotal * (Number(tax_rate) / 100) * 100) / 100
+        }
+        return Number(tax_rate) || 0
+      },
+
+      getDiscountAmount: () => {
+        const { discount, discount_type } = get().invoice
+        const subtotal = get().getSubtotal()
+        if (discount_type === 'percent') {
+          return Math.round(subtotal * (Number(discount) / 100) * 100) / 100
+        }
+        return Number(discount) || 0
+      },
+
+      getTotal: () => {
+        const subtotal = get().getSubtotal()
+        const tax = get().getTaxAmount()
+        const disc = get().getDiscountAmount()
+        const shipping = Number(get().invoice.shipping) || 0
+        return Math.round((subtotal + tax - disc + shipping) * 100) / 100
+      },
+    }),
+    {
+      name: 'evoke-invoice-draft', // key di localStorage
+      storage: createJSONStorage(() => localStorage),
+      // Hanya persist data invoice, bukan isDirty
+      partialize: (state) => ({ invoice: state.invoice }),
     }
-    return Number(tax_rate) || 0
-  },
-
-  getDiscountAmount: () => {
-    const { discount, discount_type } = get().invoice
-    const subtotal = get().getSubtotal()
-    if (discount_type === 'percent') {
-      return Math.round(subtotal * (Number(discount) / 100) * 100) / 100
-    }
-    return Number(discount) || 0
-  },
-
-  getTotal: () => {
-    const subtotal = get().getSubtotal()
-    const tax = get().getTaxAmount()
-    const disc = get().getDiscountAmount()
-    const shipping = Number(get().invoice.shipping) || 0
-    return Math.round((subtotal + tax - disc + shipping) * 100) / 100
-  },
-}))
+  )
+)
