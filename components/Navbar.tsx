@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, LogIn, LogOut, User, History, Plus } from 'lucide-react'
+import Image from 'next/image'
+import { History, LogIn, LogOut, Plus, User } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import Button from './ui/Button'
 import AuthModal from './auth/AuthModal'
@@ -20,9 +21,13 @@ export default function Navbar() {
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <FileText className="w-4.5 h-4.5 text-white" />
-            </div>
+            <Image
+              src="/icon.png"
+              alt="Evoke Invoice"
+              width={32}
+              height={32}
+              className="rounded-lg"
+            />
             <div>
               <span className="font-bold text-gray-900 text-base">Evoke</span>
               <span className="font-bold text-indigo-600 text-base"> Invoice</span>

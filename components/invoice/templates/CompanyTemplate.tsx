@@ -1,11 +1,10 @@
 'use client'
 
+import Image from 'next/image'
 import { useInvoiceStore } from '@/store/invoiceStore'
 import EditableField from '../EditableField'
 import ItemsTable from '../ItemsTable'
 import SummarySection from '../SummarySection'
-import { formatDate } from '@/lib/utils'
-import { Building2 } from 'lucide-react'
 
 export default function CompanyTemplate() {
   const { invoice, updateInvoice } = useInvoiceStore()
@@ -27,8 +26,8 @@ export default function CompanyTemplate() {
               className="h-16 w-16 object-contain rounded-xl border border-gray-100"
             />
             ) : (
-              <div className="h-16 w-16 bg-indigo-100 rounded-xl flex items-center justify-center">
-                <Building2 className="w-8 h-8 text-indigo-400" />
+              <div className="h-16 w-16 rounded-xl overflow-hidden border border-gray-100">
+                <Image src="/icon.png" alt="Logo" width={64} height={64} className="object-contain" />
               </div>
             )}
           </div>

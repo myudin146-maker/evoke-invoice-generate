@@ -8,6 +8,7 @@ import { formatCurrency } from '@/lib/utils'
 import { InvoiceStatus, InvoicePreset } from '@/types/invoice'
 import Button from '../ui/Button'
 import TemplatePresetsModal from './TemplatePresetsModal'
+import Image from 'next/image'
 import {
   Download, Save, RotateCcw, Upload, Palette, LayoutTemplate,
   DollarSign, Bookmark, BookOpen,
@@ -162,13 +163,18 @@ export default function SidebarControls() {
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
             <Palette className="w-3.5 h-3.5" /> Logo Perusahaan
           </p>
-          {invoice.logo_url && (
+          {invoice.logo_url ? (
             <div className="mb-3 flex items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={invoice.logo_url} alt="Logo" className="h-10 w-auto object-contain rounded border border-gray-100" />
+              <img key={invoice.logo_url} src={invoice.logo_url} alt="Logo" className="h-10 w-auto object-contain rounded border border-gray-100" />
               <button onClick={() => updateInvoice({ logo_url: null })} className="text-xs text-red-400 hover:text-red-600">
                 Hapus
               </button>
+            </div>
+          ) : (
+            <div className="mb-3 flex items-center gap-2">
+              <Image src="/icon.png" alt="Default logo" width={40} height={40} className="rounded border border-gray-100 opacity-40" />
+              <span className="text-xs text-gray-400">Belum ada logo</span>
             </div>
           )}
           <input type="file" ref={fileRef} accept="image/*" className="hidden" onChange={handleLogoUpload} />
