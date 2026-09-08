@@ -1,22 +1,52 @@
 'use client'
 
 import { useInvoiceStore } from '@/store/invoiceStore'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, formatNumberInput, parseNumberInput } from '@/lib/utils'
 import { Plus, Trash2 } from 'lucide-react'
+import { useState } from 'react'
 
 export default function ItemsTable() {
   const { invoice, updateItem, addItem, removeItem } = useInvoiceStore()
   const { items, currency } = invoice
 
-  const handleNumberInput = (
-    id: string,
-    field: 'quantity' | 'unit_price',
-    raw: string
-  ) => {
-    // Allow only numbers and decimal point
+  // Track input string per-field agar user bisa mengetik bebas
+  const [inputValues, setInputValues] = useState<Record<string, { qty?: string; price?: string }>>({})
+
+  const getQtyDisplay = (item: { id: string; quantity: number }) => {
+    return inputValues[item.id]?.qty ?? (item.quantity === 0 ? '' : String(item.quantity))
+  }
+
+  const getPriceDisplay = (item: { id: string; unit_price: number }) => {
+    return inputValues[item.id]?.price ?? formatNumberInput(item.unit_price)
+  }
+
+  const handleQtyChange = (id: string, raw: string) => {
+    // Hanya angka dan titik desimal
     const cleaned = raw.replace(/[^0-9.]/g, '')
+    setInputValues((prev) => ({ ...prev, [id]: { ...prev[id], qty: cleaned } }))
     const val = parseFloat(cleaned) || 0
-    updateItem(id, { [field]: val })
+    updateItem(id, { quantity: val })
+  }
+
+  const handleQtyBlur = (id: string) => {
+    setInputValues((prev) => ({ ...prev, [id]: { ...prev[id], qty: undefined } }))
+  }
+
+  const handlePriceChange = (id: string, raw: string) => {
+    // Hapus titik ribuan agar user bisa ketik angka biasa atau dengan titik
+    const withoutThousands = raw.replace(/\./g, '')
+    // Hanya angka
+    const cleaned = withoutThousands.replace(/[^0-9]/g, '')
+    // Format ulang dengan titik ribuan
+    const num = parseInt(cleaned) || 0
+    const formatted = num === 0 ? '' : new Intl.NumberFormat('id-ID').format(num)
+    setInputValues((prev) => ({ ...prev, [id]: { ...prev[id], price: formatted } }))
+    updateItem(id, { unit_price: num })
+  }
+
+  const handlePriceBlur = (id: string, unit_price: number) => {
+    const formatted = formatNumberInput(unit_price)
+    setInputValues((prev) => ({ ...prev, [id]: { ...prev[id], price: formatted } }))
   }
 
   return (
@@ -56,8 +86,9 @@ export default function ItemsTable() {
                 <input
                   type="text"
                   inputMode="decimal"
-                  value={item.quantity === 0 ? '' : item.quantity}
-                  onChange={(e) => handleNumberInput(item.id, 'quantity', e.target.value)}
+                  value={getQtyDisplay(item)}
+                  onChange={(e) => handleQtyChange(item.id, e.target.value)}
+                  onBlur={() => handleQtyBlur(item.id)}
                   placeholder="1"
                   className="editable-field w-full text-right text-gray-700 bg-transparent"
                 />
@@ -66,9 +97,10 @@ export default function ItemsTable() {
               <td className="py-2.5 px-3">
                 <input
                   type="text"
-                  inputMode="decimal"
-                  value={item.unit_price === 0 ? '' : item.unit_price}
-                  onChange={(e) => handleNumberInput(item.id, 'unit_price', e.target.value)}
+                  inputMode="numeric"
+                  value={getPriceDisplay(item)}
+                  onChange={(e) => handlePriceChange(item.id, e.target.value)}
+                  onBlur={() => handlePriceBlur(item.id, item.unit_price)}
                   placeholder="0"
                   className="editable-field w-full text-right text-gray-700 bg-transparent"
                 />

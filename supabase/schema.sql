@@ -164,3 +164,40 @@ create policy "Users can delete own logos"
 -- Run this if your invoices table already exists
 -- =============================================
 ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS status text default 'draft';
+
+
+-- =============================================
+-- Table: invoice_templates
+-- Template disimpan di cloud per user, bisa
+-- diakses dari device/akun manapun.
+-- =============================================
+create table if not exists public.invoice_templates (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users on delete cascade not null,
+  name text not null,
+  data jsonb not null,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+alter table public.invoice_templates enable row level security;
+
+create policy "Users can view own templates"
+  on public.invoice_templates for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert own templates"
+  on public.invoice_templates for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can update own templates"
+  on public.invoice_templates for update
+  using (auth.uid() = user_id);
+
+create policy "Users can delete own templates"
+  on public.invoice_templates for delete
+  using (auth.uid() = user_id);
+
+create trigger invoice_templates_updated_at
+  before update on public.invoice_templates
+  for each row execute procedure public.handle_updated_at();

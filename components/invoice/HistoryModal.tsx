@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Modal from '../ui/Modal'
 import Button from '../ui/Button'
 import { getUserInvoices, deleteInvoice } from '@/lib/invoiceService'
-import { savePreset } from '@/lib/presetService'
+import { saveTemplate } from '@/lib/templateService'
 import { useAuth } from '@/context/AuthContext'
 import { useInvoiceStore } from '@/store/invoiceStore'
 import { SavedInvoice, InvoiceStatus } from '@/types/invoice'
@@ -59,13 +59,12 @@ export default function HistoryModal({ isOpen, onClose }: HistoryModalProps) {
     if (ok) setInvoices((prev) => prev.filter((i) => i.id !== id))
   }
 
-  const handleSaveAsTemplate = (inv: SavedInvoice) => {
-    if (!inv.data) return
-    const name = prompt('Nama template:', `Template - ${inv.client_name}`)
+  const handleSaveAsTemplate = async (inv: SavedInvoice) => {
+    if (!inv.data || !user) return
+    const name = prompt('Nama template:', `${inv.data.company_name}`)
     if (!name) return
-    // Simpan dengan user ID agar terisolasi per akun
-    savePreset({ name, data: inv.data }, user?.id)
-    showToast('📋 Disimpan sebagai template!')
+    const result = await saveTemplate(name, inv.data, user.id)
+    if (result) showToast('📋 Disimpan sebagai template!')
   }
 
   return (

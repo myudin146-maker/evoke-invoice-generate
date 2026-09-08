@@ -71,3 +71,13 @@ export interface InvoicePreset {
   data: InvoiceData
   created_at: string
 }
+
+// Template yang disimpan di Supabase (cloud)
+export interface CloudTemplate {
+  id: string
+  user_id: string
+  name: string
+  data: InvoiceData
+  created_at: string
+  updated_at: string
+}

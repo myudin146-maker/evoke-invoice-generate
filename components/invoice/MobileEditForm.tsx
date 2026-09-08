@@ -4,9 +4,11 @@ import { useState, useRef, memo, useCallback } from 'react'
 import { useInvoiceStore } from '@/store/invoiceStore'
 import { useAuth } from '@/context/AuthContext'
 import { uploadLogo } from '@/lib/invoiceService'
+import { saveTemplate } from '@/lib/templateService'
 import { formatCurrency } from '@/lib/utils'
-import { X, Plus, Trash2, ChevronDown, ChevronUp, Pencil, Upload } from 'lucide-react'
+import { X, Plus, Trash2, ChevronDown, ChevronUp, Pencil, Upload, BookOpen, Bookmark } from 'lucide-react'
 import Button from '../ui/Button'
+import TemplatePresetsModal from './TemplatePresetsModal'
 import { InvoiceItem } from '@/types/invoice'
 
 // ─── Sub-komponen statis (didefinisikan di luar agar tidak re-mount) ───────────
@@ -143,6 +145,8 @@ export default function MobileEditForm() {
 
   const [open, setOpen] = useState(false)
   const [activeSection, setActiveSection] = useState<string | null>('sender')
+  const [showTemplates, setShowTemplates] = useState(false)
+  const [templateMsg, setTemplateMsg] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
   const handleToggle = useCallback((id: string) => {
@@ -161,6 +165,20 @@ export default function MobileEditForm() {
       reader.readAsDataURL(file)
     }
     if (fileRef.current) fileRef.current.value = ''
+  }
+
+  const handleSaveAsTemplate = async () => {
+    if (!user) {
+      alert('Login dulu untuk menyimpan template ke cloud.')
+      return
+    }
+    const name = prompt('Nama template:', invoice.company_name)
+    if (!name) return
+    const result = await saveTemplate(name, invoice, user.id)
+    if (result) {
+      setTemplateMsg('📋 Template disimpan!')
+      setTimeout(() => setTemplateMsg(''), 2500)
+    }
   }
 
   if (!open) {
@@ -182,6 +200,7 @@ export default function MobileEditForm() {
   const total = getTotal()
 
   return (
+    <>
     <div className="lg:hidden fixed inset-0 z-50 flex flex-col bg-white">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-white sticky top-0">
@@ -197,6 +216,31 @@ export default function MobileEditForm() {
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
 
+        {/* Template actions */}
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => setShowTemplates(true)}
+            className="flex items-center justify-center gap-2 py-2.5 bg-blue-50 text-blue-600 rounded-xl text-sm font-medium border border-blue-100 hover:bg-blue-100 transition"
+          >
+            <BookOpen className="w-4 h-4" />
+            Template Saya
+          </button>
+          <button
+            type="button"
+            onClick={handleSaveAsTemplate}
+            className="flex items-center justify-center gap-2 py-2.5 bg-amber-50 text-amber-600 rounded-xl text-sm font-medium border border-amber-100 hover:bg-amber-100 transition"
+          >
+            <Bookmark className="w-4 h-4" />
+            Simpan Template
+          </button>
+        </div>
+
+        {templateMsg && (
+          <div className="text-sm text-center py-2 px-3 bg-blue-50 text-blue-700 rounded-xl">
+            {templateMsg}
+          </div>
+        )}
         <Section id="sender" title="🏢 Info Pengirim" active={activeSection} onToggle={handleToggle}>
           {/* Logo upload */}
           <div>
@@ -338,5 +382,8 @@ export default function MobileEditForm() {
         </Button>
       </div>
     </div>
+
+    <TemplatePresetsModal isOpen={showTemplates} onClose={() => setShowTemplates(false)} />
+    </>
   )
 }

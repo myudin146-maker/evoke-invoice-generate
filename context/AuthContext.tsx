@@ -54,6 +54,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             })
           }
 
+          // Saat login baru, migrasi template localStorage lama ke cloud
+          if (event === 'SIGNED_IN' && nextUser) {
+            import('@/lib/templateService').then(({ migrateLocalTemplatesToCloud }) => {
+              migrateLocalTemplatesToCloud(nextUser.id)
+            })
+            // Sync invoice guest ke cloud
+            import('@/lib/invoiceService').then(({ syncLocalToCloud }) => {
+              syncLocalToCloud(nextUser.id)
+            })
+          }
+
           setSession(session)
           setUser(nextUser)
           setLoading(false)

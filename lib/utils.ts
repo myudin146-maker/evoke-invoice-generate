@@ -51,3 +51,28 @@ export function formatDate(dateStr: string): string {
     year: 'numeric',
   }).format(date)
 }
+
+/**
+ * Format angka dengan pemisah ribuan (titik) untuk ditampilkan di input.
+ * Contoh: 1500000 → "1.500.000"
+ */
+export function formatNumberInput(value: number | string): string {
+  if (value === '' || value === 0) return ''
+  const num = typeof value === 'string' ? parseFloat(value.replace(/\./g, '').replace(',', '.')) : value
+  if (isNaN(num) || num === 0) return ''
+  return new Intl.NumberFormat('id-ID', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(num)
+}
+
+/**
+ * Parse string angka berformat (titik ribuan) ke number.
+ * Contoh: "1.500.000" → 1500000
+ */
+export function parseNumberInput(raw: string): number {
+  // Hapus titik ribuan, ganti koma desimal ke titik
+  const cleaned = raw.replace(/\./g, '').replace(',', '.')
+  const val = parseFloat(cleaned)
+  return isNaN(val) ? 0 : val
+}

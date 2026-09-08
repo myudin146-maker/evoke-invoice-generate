@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import { useInvoiceStore } from '@/store/invoiceStore'
 import { useAuth } from '@/context/AuthContext'
 import { saveInvoice, uploadLogo } from '@/lib/invoiceService'
-import { savePreset } from '@/lib/presetService'
+import { saveTemplate } from '@/lib/templateService'
 import { formatCurrency } from '@/lib/utils'
 import { InvoiceStatus } from '@/types/invoice'
 import Button from '../ui/Button'
@@ -12,7 +12,7 @@ import TemplatePresetsModal from './TemplatePresetsModal'
 import Image from 'next/image'
 import {
   Download, Save, RotateCcw, Upload, Palette, LayoutTemplate,
-  DollarSign, Bookmark, BookOpen,
+  DollarSign, Bookmark, BookOpen, FilePlus,
 } from 'lucide-react'
 
 const STATUS_OPTIONS: { value: InvoiceStatus; label: string; color: string; active: string }[] = [
@@ -24,7 +24,7 @@ const STATUS_OPTIONS: { value: InvoiceStatus; label: string; color: string; acti
 
 export default function SidebarControls() {
   const {
-    invoice, updateInvoice, resetInvoice,
+    invoice, updateInvoice, resetInvoice, newInvoice,
     getSubtotal, getTaxAmount, getDiscountAmount, getTotal,
     currentInvoiceId, setCurrentInvoiceId,
   } = useInvoiceStore()
@@ -81,13 +81,18 @@ export default function SidebarControls() {
     if (fileRef.current) fileRef.current.value = ''
   }
 
-  const handleSaveAsTemplate = () => {
-    const name = prompt('Nama template:', `${invoice.company_name} - ${invoice.client_name}`)
+  const handleSaveAsTemplate = async () => {
+    if (!user) {
+      alert('Login dulu untuk menyimpan template ke cloud.')
+      return
+    }
+    const name = prompt('Nama template:', `${invoice.company_name}`)
     if (!name) return
-    // Simpan dengan user ID agar terisolasi per akun
-    savePreset({ name, data: invoice }, user?.id)
-    setSaveMsg('📋 Template disimpan!')
-    setTimeout(() => setSaveMsg(''), 2000)
+    const result = await saveTemplate(name, invoice, user.id)
+    if (result) {
+      setSaveMsg('📋 Template disimpan!')
+      setTimeout(() => setSaveMsg(''), 2000)
+    }
   }
 
   return (
@@ -238,9 +243,13 @@ export default function SidebarControls() {
             </Button>
           </div>
 
+          <Button variant="ghost" size="sm" className="w-full text-blue-500 hover:bg-blue-50" onClick={newInvoice}>
+            <FilePlus className="w-3.5 h-3.5" />
+            Invoice Baru
+          </Button>
           <Button variant="ghost" size="sm" className="w-full text-gray-400" onClick={resetInvoice}>
             <RotateCcw className="w-3.5 h-3.5" />
-            Reset Invoice
+            Reset Total
           </Button>
         </div>
 

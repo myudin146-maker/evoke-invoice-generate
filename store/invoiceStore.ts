@@ -50,6 +50,7 @@ interface InvoiceStore {
   addItem: () => void
   removeItem: (id: string) => void
   resetInvoice: () => void
+  newInvoice: () => void
   loadInvoice: (data: InvoiceData, invoiceId?: string) => void
   setCurrentInvoiceId: (id: string | null) => void
   getSubtotal: () => number
@@ -124,6 +125,51 @@ export const useInvoiceStore = create<InvoiceStore>()(
       resetInvoice: () => {
         set({
           invoice: { ...defaultInvoiceData, invoice_number: generateInvoiceNumber() },
+          isDirty: false,
+          currentInvoiceId: null,
+        })
+      },
+
+      // Invoice baru: pertahankan data perusahaan, reset hanya data klien & transaksi
+      newInvoice: () => {
+        const { invoice } = get()
+        const today = new Date().toISOString().split('T')[0]
+        const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        set({
+          invoice: {
+            // Pertahankan data perusahaan & preferensi
+            template: invoice.template,
+            currency: invoice.currency,
+            logo_url: invoice.logo_url,
+            company_name: invoice.company_name,
+            sender_address: invoice.sender_address,
+            tax_number: invoice.tax_number,
+            business_reg_number: invoice.business_reg_number,
+            bank_info: invoice.bank_info,
+            tax_rate: invoice.tax_rate,
+            tax_type: invoice.tax_type,
+            discount_type: invoice.discount_type,
+            // Reset data transaksi / klien
+            status: 'draft',
+            client_name: 'Nama Klien',
+            client_address: 'Alamat Klien, Kota, Kode Pos',
+            invoice_number: generateInvoiceNumber(),
+            issue_date: today,
+            due_date: dueDate,
+            items: [
+              {
+                id: crypto.randomUUID(),
+                item_name: 'Layanan / Produk',
+                description: 'Deskripsi layanan atau produk',
+                quantity: 1,
+                unit_price: 0,
+                total_price: 0,
+              },
+            ],
+            discount: 0,
+            shipping: 0,
+            notes: invoice.notes,
+          },
           isDirty: false,
           currentInvoiceId: null,
         })
