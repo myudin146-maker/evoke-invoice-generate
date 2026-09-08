@@ -47,54 +47,71 @@ body {
   min-height: 1123px;
 }
 
-/* Print / PDF styles */
+/* Print / PDF styles — konsisten di semua device */
 @media print {
-  * {
-    visibility: hidden;
+  /* Sembunyikan semua elemen */
+  body * {
+    visibility: hidden !important;
   }
 
+  /* Tampilkan hanya invoice canvas */
   #invoice-canvas,
   #invoice-canvas * {
-    visibility: visible;
+    visibility: visible !important;
   }
 
+  /* Sembunyikan elemen no-print */
   .no-print,
   .no-print * {
     display: none !important;
     visibility: hidden !important;
   }
 
-  body {
+  /* Reset body */
+  html, body {
+    width: 210mm !important;
+    height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
     background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
+  /* Canvas invoice: full A4, reset semua transform */
   #invoice-canvas {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
-    /* Reset transform yang dipakai untuk scaling di layar kecil */
+    /* Reset transform dari responsive scaling */
     transform: none !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    transform-origin: unset !important;
+    /* Paksa lebar A4 */
+    width: 210mm !important;
+    min-width: 210mm !important;
+    max-width: 210mm !important;
     min-height: auto !important;
+    /* Hapus dekorasi UI */
     box-shadow: none !important;
     border-radius: 0 !important;
     margin: 0 !important;
-    padding: 30px !important;
+    padding: 15mm !important;
+    background: white !important;
+    font-size: 10pt !important;
   }
 
+  /* Tabel tidak terpotong antar halaman */
   tr {
-    page-break-inside: avoid;
+    page-break-inside: avoid !important;
   }
 
   thead {
-    display: table-header-group;
+    display: table-header-group !important;
   }
 
+  /* Ukuran halaman A4 portrait, tanpa margin browser */
   @page {
-    size: A4 portrait;
+    size: 210mm 297mm portrait;
     margin: 0;
   }
 }

@@ -10,26 +10,53 @@ export default function InvoiceCanvas() {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
 
-  // Responsive scale: shrink canvas agar fit di layar kecil
   useEffect(() => {
-    const scale = () => {
+    const CANVAS_WIDTH = 794
+
+    const applyScale = () => {
       if (!wrapperRef.current || !canvasRef.current) return
       const wrapperWidth = wrapperRef.current.offsetWidth
-      const canvasWidth = 794
-      if (wrapperWidth < canvasWidth) {
-        const ratio = wrapperWidth / canvasWidth
+
+      if (wrapperWidth < CANVAS_WIDTH) {
+        const ratio = wrapperWidth / CANVAS_WIDTH
         canvasRef.current.style.transform = `scale(${ratio})`
         canvasRef.current.style.transformOrigin = 'top left'
+        // Adjust wrapper height agar tidak ada blank space
         wrapperRef.current.style.height = `${1123 * ratio}px`
       } else {
         canvasRef.current.style.transform = 'none'
+        canvasRef.current.style.transformOrigin = 'unset'
         wrapperRef.current.style.height = 'auto'
       }
     }
 
-    scale()
-    window.addEventListener('resize', scale)
-    return () => window.removeEventListener('resize', scale)
+    applyScale()
+    window.addEventListener('resize', applyScale)
+
+    // Saat print dimulai: reset transform agar A4 konsisten
+    const beforePrint = () => {
+      if (canvasRef.current) {
+        canvasRef.current.style.transform = 'none'
+        canvasRef.current.style.transformOrigin = 'unset'
+      }
+      if (wrapperRef.current) {
+        wrapperRef.current.style.height = 'auto'
+      }
+    }
+
+    // Setelah print selesai: kembalikan scaling
+    const afterPrint = () => {
+      applyScale()
+    }
+
+    window.addEventListener('beforeprint', beforePrint)
+    window.addEventListener('afterprint', afterPrint)
+
+    return () => {
+      window.removeEventListener('resize', applyScale)
+      window.removeEventListener('beforeprint', beforePrint)
+      window.removeEventListener('afterprint', afterPrint)
+    }
   }, [])
 
   return (
