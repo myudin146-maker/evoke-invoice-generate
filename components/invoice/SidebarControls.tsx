@@ -4,8 +4,9 @@ import { useRef, useState } from 'react'
 import { useInvoiceStore } from '@/store/invoiceStore'
 import { useAuth } from '@/context/AuthContext'
 import { saveInvoice, uploadLogo } from '@/lib/invoiceService'
+import { savePreset } from '@/lib/presetService'
 import { formatCurrency } from '@/lib/utils'
-import { InvoiceStatus, InvoicePreset } from '@/types/invoice'
+import { InvoiceStatus } from '@/types/invoice'
 import Button from '../ui/Button'
 import TemplatePresetsModal from './TemplatePresetsModal'
 import Image from 'next/image'
@@ -83,10 +84,8 @@ export default function SidebarControls() {
   const handleSaveAsTemplate = () => {
     const name = prompt('Nama template:', `${invoice.company_name} - ${invoice.client_name}`)
     if (!name) return
-    const raw = localStorage.getItem('evoke-invoice-presets')
-    const presets: InvoicePreset[] = raw ? JSON.parse(raw) : []
-    presets.unshift({ id: crypto.randomUUID(), name, data: invoice, created_at: new Date().toISOString() })
-    localStorage.setItem('evoke-invoice-presets', JSON.stringify(presets))
+    // Simpan dengan user ID agar terisolasi per akun
+    savePreset({ name, data: invoice }, user?.id)
     setSaveMsg('📋 Template disimpan!')
     setTimeout(() => setSaveMsg(''), 2000)
   }

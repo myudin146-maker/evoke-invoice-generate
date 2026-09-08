@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import Modal from '../ui/Modal'
 import { useInvoiceStore } from '@/store/invoiceStore'
+import { useAuth } from '@/context/AuthContext'
+import { getPresets, deletePreset } from '@/lib/presetService'
 import { InvoicePreset } from '@/types/invoice'
 import { Trash2, FileText } from 'lucide-react'
 
@@ -13,14 +15,15 @@ interface TemplatePresetsModalProps {
 
 export default function TemplatePresetsModal({ isOpen, onClose }: TemplatePresetsModalProps) {
   const loadInvoice = useInvoiceStore((s) => s.loadInvoice)
+  const { user } = useAuth()
   const [presets, setPresets] = useState<InvoicePreset[]>([])
 
   useEffect(() => {
     if (isOpen) {
-      const raw = localStorage.getItem('evoke-invoice-presets')
-      setPresets(raw ? JSON.parse(raw) : [])
+      // Load hanya preset milik user yang sedang login (atau guest)
+      setPresets(getPresets(user?.id))
     }
-  }, [isOpen])
+  }, [isOpen, user?.id])
 
   const handleLoad = (preset: InvoicePreset) => {
     loadInvoice(preset.data)
@@ -29,19 +32,23 @@ export default function TemplatePresetsModal({ isOpen, onClose }: TemplatePreset
 
   const handleDelete = (id: string) => {
     if (!confirm('Hapus template ini?')) return
-    const updated = presets.filter((p) => p.id !== id)
-    setPresets(updated)
-    localStorage.setItem('evoke-invoice-presets', JSON.stringify(updated))
+    deletePreset(id, user?.id)
+    setPresets((prev) => prev.filter((p) => p.id !== id))
   }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Template Saya" className="max-w-md">
+      {!user && (
+        <p className="text-xs text-amber-600 bg-amber-50 rounded-xl px-3 py-2 mb-3">
+          ⚠️ Template guest tidak tersimpan permanen. Masuk untuk menyimpan template ke akun kamu.
+        </p>
+      )}
       {presets.length === 0 ? (
         <div className="text-center py-10">
           <FileText className="w-10 h-10 text-gray-200 mx-auto mb-3" />
           <p className="text-sm text-gray-400">Belum ada template tersimpan</p>
           <p className="text-xs text-gray-300 mt-1">
-            Simpan invoice sebagai template dari tombol di sidebar atau dari ikon bookmark di Riwayat
+            Simpan invoice sebagai template dari tombol di sidebar atau ikon bookmark di Riwayat
           </p>
         </div>
       ) : (

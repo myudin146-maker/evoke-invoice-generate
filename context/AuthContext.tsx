@@ -72,6 +72,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Reset draft saat logout
     localStorage.removeItem('evoke-invoice-draft')
+    // Hapus preset guest
+    const { clearGuestPresets } = await import('@/lib/presetService')
+    clearGuestPresets()
     const { createClient } = await import('@/lib/supabase/client')
     await createClient().auth.signOut()
 

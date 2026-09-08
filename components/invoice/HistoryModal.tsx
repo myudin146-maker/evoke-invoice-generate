@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react'
 import Modal from '../ui/Modal'
 import Button from '../ui/Button'
 import { getUserInvoices, deleteInvoice } from '@/lib/invoiceService'
+import { savePreset } from '@/lib/presetService'
 import { useAuth } from '@/context/AuthContext'
 import { useInvoiceStore } from '@/store/invoiceStore'
-import { SavedInvoice, InvoicePreset, InvoiceStatus } from '@/types/invoice'
+import { SavedInvoice, InvoiceStatus } from '@/types/invoice'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { Trash2, FileEdit, Loader2, Bookmark } from 'lucide-react'
 
@@ -62,15 +63,8 @@ export default function HistoryModal({ isOpen, onClose }: HistoryModalProps) {
     if (!inv.data) return
     const name = prompt('Nama template:', `Template - ${inv.client_name}`)
     if (!name) return
-    const raw = localStorage.getItem('evoke-invoice-presets')
-    const presets: InvoicePreset[] = raw ? JSON.parse(raw) : []
-    presets.unshift({
-      id: crypto.randomUUID(),
-      name,
-      data: inv.data,
-      created_at: new Date().toISOString(),
-    })
-    localStorage.setItem('evoke-invoice-presets', JSON.stringify(presets))
+    // Simpan dengan user ID agar terisolasi per akun
+    savePreset({ name, data: inv.data }, user?.id)
     showToast('📋 Disimpan sebagai template!')
   }
 
