@@ -9,13 +9,9 @@ export const metadata: Metadata = {
   title: 'Evoke Invoice Generator',
   description: 'Buat invoice profesional dengan mudah dan cepat',
   icons: {
-    icon: [
-      { url: '/icon.png', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/icon.png', type: 'image/png' },
-    ],
-    shortcut: '/icon.png',
+    icon: '/favicon.ico',
+    apple: '/icon.png',
+    shortcut: '/favicon.ico',
   },
 }
 
@@ -27,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.png" type="image/png" />
         <link rel="apple-touch-icon" href="/icon.png" />
       </head>
