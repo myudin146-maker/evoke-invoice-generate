@@ -62,7 +62,7 @@ export default function CompanyTemplate() {
 
         {/* Invoice Title */}
         <div className="text-right">
-          <h1 className="text-4xl font-extrabold text-indigo-600 tracking-tight">INVOICE</h1>
+          <h1 className="text-4xl font-extrabold text-blue-600 tracking-tight">INVOICE</h1>
           <div className="mt-2 text-sm text-gray-500 space-y-1">
             <div className="flex items-center justify-end gap-1">
               <span className="font-medium text-gray-700">#</span>
@@ -78,7 +78,7 @@ export default function CompanyTemplate() {
       </div>
 
       {/* Divider */}
-      <div className="border-t-2 border-indigo-600 mb-8" />
+      <div className="border-t-2 border-blue-600 mb-8" />
 
       {/* Bill To + Dates */}
       <div className="grid grid-cols-2 gap-8 mb-8">

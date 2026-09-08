@@ -3,6 +3,11 @@
 :root {
   --background: #f8f9fa;
   --foreground: #171717;
+  /* Brand blue dari icon.png */
+  --brand: #1f6bff;
+  --brand-dark: #1557e0;
+  --brand-light: #e8f0ff;
+  --brand-mid: #3d82ff;
 }
 
 * {

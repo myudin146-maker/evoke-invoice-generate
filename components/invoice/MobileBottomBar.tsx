@@ -33,13 +33,13 @@ export default function MobileBottomBar() {
       {/* Total bar */}
       <div className="px-4 pt-2 pb-1 flex justify-between items-center text-sm">
         <span className="text-gray-500">Total</span>
-        <span className="font-bold text-indigo-600">{formatCurrency(getTotal(), invoice.currency)}</span>
+        <span className="font-bold text-blue-600">{formatCurrency(getTotal(), invoice.currency)}</span>
       </div>
       {/* Action buttons */}
       <div className="px-4 pb-4 flex gap-2">
         <button
           onClick={() => window.print()}
-          className="flex-1 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium"
+          className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium"
         >
           🖨️ Print / PDF
         </button>
@@ -47,7 +47,7 @@ export default function MobileBottomBar() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex-1 py-2.5 border border-indigo-600 text-indigo-600 rounded-xl text-sm font-medium disabled:opacity-50"
+            className="flex-1 py-2.5 border border-blue-600 text-blue-600 rounded-xl text-sm font-medium disabled:opacity-50"
           >
             {saving ? '...' : saveMsg || '☁️ Simpan'}
           </button>

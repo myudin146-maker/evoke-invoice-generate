@@ -106,8 +106,8 @@ export default function SidebarControls() {
                 onClick={() => updateInvoice({ template: t })}
                 className={`py-2.5 px-3 rounded-xl border text-sm font-medium transition ${
                   invoice.template === t
-                    ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                    : 'border-gray-200 text-gray-600 hover:border-indigo-300'
+                    ? 'border-blue-600 bg-blue-50 text-blue-700'
+                    : 'border-gray-200 text-gray-600 hover:border-blue-300'
                 }`}
               >
                 {t === 'company' ? '🏢 Company' : '✨ Simple'}
@@ -148,8 +148,8 @@ export default function SidebarControls() {
                 onClick={() => updateInvoice({ currency: c })}
                 className={`py-2.5 px-3 rounded-xl border text-sm font-medium transition ${
                   invoice.currency === c
-                    ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                    : 'border-gray-200 text-gray-600 hover:border-indigo-300'
+                    ? 'border-blue-600 bg-blue-50 text-blue-700'
+                    : 'border-gray-200 text-gray-600 hover:border-blue-300'
                 }`}
               >
                 {c === 'IDR' ? '🇮🇩 IDR' : '🇺🇸 USD'}
@@ -206,7 +206,7 @@ export default function SidebarControls() {
             )}
             <div className="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-100">
               <span>Total</span>
-              <span className="text-indigo-600">{formatCurrency(total, invoice.currency)}</span>
+              <span className="text-blue-600">{formatCurrency(total, invoice.currency)}</span>
             </div>
           </div>
         </div>
@@ -233,7 +233,7 @@ export default function SidebarControls() {
               <Bookmark className="w-3.5 h-3.5" />
               Simpan Template
             </Button>
-            <Button variant="ghost" size="sm" className="text-indigo-600 hover:bg-indigo-50" onClick={() => setShowPresets(true)}>
+            <Button variant="ghost" size="sm" className="text-blue-600 hover:bg-blue-50" onClick={() => setShowPresets(true)}>
               <BookOpen className="w-3.5 h-3.5" />
               Template Saya
             </Button>
@@ -246,7 +246,7 @@ export default function SidebarControls() {
         </div>
 
         {currentInvoiceId && (
-          <p className="text-xs text-indigo-400 text-center">
+          <p className="text-xs text-blue-400 text-center">
             ✏️ Sedang mengedit invoice tersimpan
           </p>
         )}

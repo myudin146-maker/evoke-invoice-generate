@@ -30,7 +30,7 @@ export default function Navbar() {
             />
             <div>
               <span className="font-bold text-gray-900 text-base">Evoke</span>
-              <span className="font-bold text-indigo-600 text-base"> Invoice</span>
+              <span className="font-bold text-blue-600 text-base"> Invoice</span>
             </div>
           </div>
 
@@ -57,8 +57,8 @@ export default function Navbar() {
                   <span className="hidden sm:inline">Riwayat</span>
                 </Button>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-indigo-600" />
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-blue-600" />
                   </div>
                   <span className="text-sm text-gray-600 hidden md:block max-w-[140px] truncate">
                     {user.email}

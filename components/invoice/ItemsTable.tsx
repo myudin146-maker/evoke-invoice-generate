@@ -96,7 +96,7 @@ export default function ItemsTable() {
       {/* Add Item */}
       <button
         onClick={addItem}
-        className="no-print mt-3 flex items-center gap-1.5 text-sm text-indigo-500 hover:text-indigo-700 transition px-3 py-1.5 rounded-lg hover:bg-indigo-50"
+        className="no-print mt-3 flex items-center gap-1.5 text-sm text-blue-500 hover:text-blue-700 transition px-3 py-1.5 rounded-lg hover:bg-blue-50"
       >
         <Plus className="w-4 h-4" />
         Tambah Item

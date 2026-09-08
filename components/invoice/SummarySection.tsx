@@ -98,7 +98,7 @@ export default function SummarySection() {
         {/* Total */}
         <div className="flex justify-between text-base font-bold text-gray-900 pt-3 border-t-2 border-gray-200">
           <span>TOTAL</span>
-          <span className="text-indigo-700">{formatCurrency(total, invoice.currency)}</span>
+          <span className="text-blue-700">{formatCurrency(total, invoice.currency)}</span>
         </div>
       </div>
     </div>

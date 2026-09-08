@@ -53,14 +53,14 @@ const Field = memo(function Field({ label, value, onChange, multiline, type }: F
           value={value}
           onChange={(e) => onChange(e.target.value)}
           rows={3}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-400 resize-none"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 resize-none"
         />
       ) : (
         <input
           type={type || 'text'}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-400"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
         />
       )}
     </div>
@@ -93,7 +93,7 @@ const ItemRow = memo(function ItemRow({ item, index, canDelete, onUpdate, onRemo
           type="text"
           value={item.item_name}
           onChange={(e) => onUpdate(item.id, { item_name: e.target.value })}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-400"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
         />
       </div>
       <div>
@@ -102,7 +102,7 @@ const ItemRow = memo(function ItemRow({ item, index, canDelete, onUpdate, onRemo
           type="text"
           value={item.description}
           onChange={(e) => onUpdate(item.id, { description: e.target.value })}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-400"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
         />
       </div>
       <div className="grid grid-cols-2 gap-2">
@@ -112,7 +112,7 @@ const ItemRow = memo(function ItemRow({ item, index, canDelete, onUpdate, onRemo
             type="number"
             value={item.quantity}
             onChange={(e) => onUpdate(item.id, { quantity: parseFloat(e.target.value) || 0 })}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-400"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
           />
         </div>
         <div>
@@ -121,11 +121,11 @@ const ItemRow = memo(function ItemRow({ item, index, canDelete, onUpdate, onRemo
             type="number"
             value={item.unit_price}
             onChange={(e) => onUpdate(item.id, { unit_price: parseFloat(e.target.value) || 0 })}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-400"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
           />
         </div>
       </div>
-      <p className="text-xs text-right text-indigo-600 font-semibold">
+      <p className="text-xs text-right text-blue-600 font-semibold">
         Total: {formatCurrency(item.total_price, currency as 'IDR' | 'USD')}
       </p>
     </div>
@@ -168,7 +168,7 @@ export default function MobileEditForm() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="lg:hidden fixed bottom-20 right-4 z-50 bg-indigo-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-indigo-700 transition"
+        className="lg:hidden fixed bottom-20 right-4 z-50 bg-blue-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-blue-700 transition"
         aria-label="Edit Invoice"
       >
         <Pencil className="w-6 h-6" />
@@ -214,7 +214,7 @@ export default function MobileEditForm() {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="w-full flex items-center justify-center gap-2 py-2.5 border-2 border-dashed border-gray-200 rounded-xl text-sm text-gray-500 hover:border-indigo-300 hover:text-indigo-500 transition"
+              className="w-full flex items-center justify-center gap-2 py-2.5 border-2 border-dashed border-gray-200 rounded-xl text-sm text-gray-500 hover:border-blue-300 hover:text-blue-500 transition"
             >
               <Upload className="w-4 h-4" />
               {invoice.logo_url ? 'Ganti Logo' : 'Upload Logo'}
@@ -251,7 +251,7 @@ export default function MobileEditForm() {
           <button
             type="button"
             onClick={addItem}
-            className="w-full flex items-center justify-center gap-2 py-2.5 border-2 border-dashed border-indigo-200 rounded-xl text-sm text-indigo-500 hover:border-indigo-400 transition"
+            className="w-full flex items-center justify-center gap-2 py-2.5 border-2 border-dashed border-blue-200 rounded-xl text-sm text-blue-500 hover:border-blue-400 transition"
           >
             <Plus className="w-4 h-4" /> Tambah Item
           </button>
@@ -278,7 +278,7 @@ export default function MobileEditForm() {
                 type="number"
                 value={invoice.tax_rate}
                 onChange={(e) => updateInvoice({ tax_rate: parseFloat(e.target.value) || 0 })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-400"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
               />
             </div>
             <div>
@@ -300,13 +300,13 @@ export default function MobileEditForm() {
                 type="number"
                 value={invoice.discount}
                 onChange={(e) => updateInvoice({ discount: parseFloat(e.target.value) || 0 })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-400"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
               />
             </div>
           </div>
           <Field label="Ongkos Kirim (Rp)" value={String(invoice.shipping)} onChange={(v) => updateInvoice({ shipping: parseFloat(v) || 0 })} type="number" />
           {/* Ringkasan */}
-          <div className="bg-indigo-50 rounded-xl p-3 space-y-1.5 text-sm mt-2">
+          <div className="bg-blue-50 rounded-xl p-3 space-y-1.5 text-sm mt-2">
             <div className="flex justify-between text-gray-600">
               <span>Subtotal</span><span>{formatCurrency(subtotal, invoice.currency)}</span>
             </div>
@@ -318,7 +318,7 @@ export default function MobileEditForm() {
                 <span>Diskon</span><span>-{formatCurrency(discountAmount, invoice.currency)}</span>
               </div>
             )}
-            <div className="flex justify-between font-bold text-indigo-700 pt-1.5 border-t border-indigo-200">
+            <div className="flex justify-between font-bold text-blue-700 pt-1.5 border-t border-blue-200">
               <span>Total</span><span>{formatCurrency(total, invoice.currency)}</span>
             </div>
           </div>

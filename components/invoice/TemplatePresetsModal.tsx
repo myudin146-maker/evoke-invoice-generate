@@ -49,12 +49,12 @@ export default function TemplatePresetsModal({ isOpen, onClose }: TemplatePreset
           {presets.map((preset) => (
             <div
               key={preset.id}
-              className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/30 transition group cursor-pointer"
+              className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition group cursor-pointer"
               onClick={() => handleLoad(preset)}
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="w-9 h-9 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-4 h-4 text-indigo-600" />
+                <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-4 h-4 text-blue-600" />
                 </div>
                 <div className="min-w-0">
                   <p className="font-medium text-sm text-gray-900 truncate">{preset.name}</p>

@@ -77,13 +77,13 @@ export default function HistoryModal({ isOpen, onClose }: HistoryModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Riwayat Invoice" className="max-w-lg">
       {toast && (
-        <div className="mb-3 text-sm text-center py-2 px-3 bg-indigo-50 text-indigo-700 rounded-xl">
+        <div className="mb-3 text-sm text-center py-2 px-3 bg-blue-50 text-blue-700 rounded-xl">
           {toast}
         </div>
       )}
       {loading ? (
         <div className="flex justify-center py-10">
-          <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
+          <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
         </div>
       ) : invoices.length === 0 ? (
         <div className="text-center py-10 text-gray-400">
@@ -97,7 +97,7 @@ export default function HistoryModal({ isOpen, onClose }: HistoryModalProps) {
             return (
               <div
                 key={inv.id}
-                className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/30 transition group"
+                className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition group"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -110,14 +110,14 @@ export default function HistoryModal({ isOpen, onClose }: HistoryModalProps) {
                   <p className="text-xs text-gray-400">{formatDate(inv.issue_date)}</p>
                 </div>
                 <div className="text-right mr-3">
-                  <p className="text-sm font-semibold text-indigo-600">
+                  <p className="text-sm font-semibold text-blue-600">
                     {formatCurrency(inv.total_amount, 'IDR')}
                   </p>
                 </div>
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition">
                   <button
                     onClick={() => handleLoad(inv)}
-                    className="p-1.5 rounded-lg hover:bg-indigo-100 text-indigo-600 transition"
+                    className="p-1.5 rounded-lg hover:bg-blue-100 text-blue-600 transition"
                     title="Edit invoice"
                   >
                     <FileEdit className="w-4 h-4" />
